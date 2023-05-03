@@ -1,0 +1,87 @@
+04/26/2023 01:34:02 PM Sorting mesd audio files by 2 emotions
+04/26/2023 01:40:05 PM Normalizing dataset using MinMaxScaler
+04/26/2023 01:40:05 PM Split train and validation dataset (80% - 20%)
+04/26/2023 01:40:07 PM Selected features [14] (svc): alphaRatio_sma3, hammarbergIndex_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc3_sma3, shimmerLocaldB_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, F1amplitudeLogRelF0_sma3nz, F2amplitudeLogRelF0_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_RMSenergy_sma
+04/26/2023 01:40:07 PM Best hyper parameters (svc): {"C": 1, "cache_size": 4096, "gamma": "scale", "kernel": "rbf", "probability": true, "tol": 0.01}
+04/26/2023 01:40:07 PM Accuracy (svc): 0.9375
+04/26/2023 01:40:07 PM F1 Score (svc): 0.9331720029784066
+04/26/2023 01:40:07 PM Confusion Matrix: (svc): 
+[[ 7  3]
+ [ 0 38]]
+04/26/2023 01:40:07 PM Classification report: (svc): 
+              precision    recall  f1-score   support
+
+           0       1.00      0.70      0.82        10
+           1       0.93      1.00      0.96        38
+
+    accuracy                           0.94        48
+   macro avg       0.96      0.85      0.89        48
+weighted avg       0.94      0.94      0.93        48
+
+04/26/2023 01:40:07 PM AUC: 1.0
+
+04/26/2023 01:40:07 PM Sorting mesd audio files by 2 emotions
+04/26/2023 01:40:07 PM Normalizing dataset using MinMaxScaler
+04/26/2023 01:40:07 PM Split train and validation dataset (80% - 20%)
+04/26/2023 01:40:07 PM Selected features [14] (nn): alphaRatio_sma3, hammarbergIndex_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc3_sma3, shimmerLocaldB_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, F1amplitudeLogRelF0_sma3nz, F2amplitudeLogRelF0_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_RMSenergy_sma
+04/26/2023 01:40:31 PM Best hyper parameters (nn): {"solver": "lbfgs", "max_iter": 4000, "learning_rate": "invscaling", "hidden_layer_sizes": 20, "alpha": 0.1, "activation": "relu"}
+04/26/2023 01:40:31 PM Accuracy (nn): 1.0
+04/26/2023 01:40:31 PM F1 Score (nn): 1.0
+04/26/2023 01:40:31 PM Confusion Matrix: (nn): 
+[[10  0]
+ [ 0 38]]
+04/26/2023 01:40:31 PM Classification report: (nn): 
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00        10
+           1       1.00      1.00      1.00        38
+
+    accuracy                           1.00        48
+   macro avg       1.00      1.00      1.00        48
+weighted avg       1.00      1.00      1.00        48
+
+04/26/2023 01:40:31 PM AUC: 1.0
+
+05/01/2023 04:38:13 PM Sorting mesd audio files by 2 emotions
+05/01/2023 04:38:13 PM Normalizing dataset using MinMaxScaler
+05/01/2023 04:38:13 PM Split train and validation dataset (60% - 40%)
+05/01/2023 04:38:15 PM Selected features [16] (nn): alphaRatio_sma3, hammarbergIndex_sma3, slope0-500_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc3_sma3, shimmerLocaldB_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, logRelF0-H1-A3_sma3nz, F1amplitudeLogRelF0_sma3nz, F2amplitudeLogRelF0_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_RMSenergy_sma
+05/01/2023 04:38:34 PM Best hyper parameters (nn): {"solver": "lbfgs", "max_iter": 3000, "learning_rate": "invscaling", "hidden_layer_sizes": [20, 20], "alpha": 0.01, "activation": "tanh"}
+05/01/2023 04:38:34 PM Accuracy (nn): 0.9895833333333334
+05/01/2023 04:38:34 PM F1 Score (nn): 0.9894761697181051
+05/01/2023 04:38:34 PM Confusion Matrix: (nn): 
+[[18  1]
+ [ 0 77]]
+05/01/2023 04:38:34 PM Classification report: (nn): 
+              precision    recall  f1-score   support
+
+           0       1.00      0.95      0.97        19
+           1       0.99      1.00      0.99        77
+
+    accuracy                           0.99        96
+   macro avg       0.99      0.97      0.98        96
+weighted avg       0.99      0.99      0.99        96
+
+05/01/2023 04:38:34 PM AUC: 1.0
+
+04/26/2023 01:40:31 PM Sorting mesd audio files by 2 emotions
+04/26/2023 01:40:31 PM Normalizing dataset using MinMaxScaler
+04/26/2023 01:40:31 PM Split train and validation dataset (80% - 20%)
+04/26/2023 01:40:31 PM Selected features [32] (dt): Loudness_sma3, alphaRatio_sma3, hammarbergIndex_sma3, slope0-500_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc3_sma3, mfcc4_sma3, F0semitoneFrom27.5Hz_sma3nz, jitterLocal_sma3nz, shimmerLocaldB_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, logRelF0-H1-A3_sma3nz, F1frequency_sma3nz, F1bandwidth_sma3nz, F1amplitudeLogRelF0_sma3nz, F2frequency_sma3nz, F2bandwidth_sma3nz, F2amplitudeLogRelF0_sma3nz, F3frequency_sma3nz, F3bandwidth_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_zcr_sma, pcm_RMSenergy_sma, pcm_fftMag_spectralCentroid_sma, pcm_fftMag_spectralRollOff25.0_sma, pcm_fftMag_spectralRollOff50.0_sma, pcm_fftMag_spectralRollOff75.0_sma, pcm_fftMag_spectralRollOff90.0_sma
+04/26/2023 01:40:32 PM Best hyper parameters (dt): {"class_weight": null, "criterion": "gini", "max_depth": 5, "max_features": "sqrt", "splitter": "best"}
+04/26/2023 01:40:32 PM Accuracy (dt): 0.9583333333333334
+04/26/2023 01:40:32 PM F1 Score (dt): 0.9565527065527064
+04/26/2023 01:40:32 PM Confusion Matrix: (dt): 
+[[ 8  2]
+ [ 0 38]]
+04/26/2023 01:40:32 PM Classification report: (dt): 
+              precision    recall  f1-score   support
+
+           0       1.00      0.80      0.89        10
+           1       0.95      1.00      0.97        38
+
+    accuracy                           0.96        48
+   macro avg       0.97      0.90      0.93        48
+weighted avg       0.96      0.96      0.96        48
+
+04/26/2023 01:40:32 PM AUC: 0.9

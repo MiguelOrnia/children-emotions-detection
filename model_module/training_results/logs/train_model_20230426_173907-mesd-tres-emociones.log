@@ -1,0 +1,95 @@
+05/03/2023 06:01:38 PM Sorting mesd audio files by 3 emotions
+05/03/2023 06:01:38 PM Normalizing dataset using MinMaxScaler
+05/03/2023 06:01:38 PM Split train and validation dataset (80% - 20%)
+05/03/2023 06:01:40 PM Selected features [16] (svc): Loudness_sma3, alphaRatio_sma3, hammarbergIndex_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc4_sma3, shimmerLocaldB_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, F1frequency_sma3nz, F1bandwidth_sma3nz, F2amplitudeLogRelF0_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_RMSenergy_sma
+05/03/2023 06:01:41 PM Best hyper parameters (svc): {"C": 1, "cache_size": 4096, "gamma": "scale", "kernel": "rbf", "probability": true, "tol": 0.01}
+05/03/2023 06:01:41 PM Accuracy (svc): 0.9137931034482759
+05/03/2023 06:01:41 PM F1 Score (svc): 0.9021533537028953
+05/03/2023 06:01:41 PM Confusion Matrix: (svc):
+[[11  0  0]
+ [ 0 37  0]
+ [ 0  5  5]]
+05/03/2023 06:01:41 PM Classification report: (svc):
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00        11
+           1       0.88      1.00      0.94        37
+           2       1.00      0.50      0.67        10
+
+    accuracy                           0.91        58
+   macro avg       0.96      0.83      0.87        58
+weighted avg       0.92      0.91      0.90        58
+
+05/03/2023 06:01:41 PM AUC: 0.9498123123123122
+
+05/03/2023 06:05:47 PM Sorting mesd audio files by 3 emotions
+05/03/2023 06:05:47 PM Normalizing dataset using MinMaxScaler
+05/03/2023 06:05:47 PM Split train and validation dataset (80% - 20%)
+05/03/2023 06:05:49 PM Selected features [16] (nn): Loudness_sma3, alphaRatio_sma3, hammarbergIndex_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc4_sma3, shimmerLocaldB_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, F1frequency_sma3nz, F1bandwidth_sma3nz, F2amplitudeLogRelF0_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_RMSenergy_sma
+05/03/2023 06:06:13 PM Best hyper parameters (nn): {"solver": "lbfgs", "max_iter": 3000, "learning_rate": "invscaling", "hidden_layer_sizes": 20, "alpha": 0.1, "activation": "relu"}
+05/03/2023 06:06:13 PM Accuracy (nn): 0.9310344827586207
+05/03/2023 06:06:13 PM F1 Score (nn): 0.9281105061504336
+05/03/2023 06:06:13 PM Confusion Matrix: (nn):
+[[11  0  0]
+ [ 0 36  1]
+ [ 0  3  7]]
+05/03/2023 06:06:13 PM Classification report: (nn):
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00        11
+           1       0.92      0.97      0.95        37
+           2       0.88      0.70      0.78        10
+
+    accuracy                           0.93        58
+   macro avg       0.93      0.89      0.91        58
+weighted avg       0.93      0.93      0.93        58
+
+05/03/2023 06:06:13 PM AUC: 0.9600868725868725
+
+05/03/2023 06:43:52 PM Sorting mesd audio files by 3 emotions
+05/03/2023 06:43:53 PM Normalizing dataset using MinMaxScaler
+05/03/2023 06:43:53 PM Split train and validation dataset (60% - 40%)
+05/03/2023 06:43:55 PM Selected features [17] (nn): Loudness_sma3, alphaRatio_sma3, hammarbergIndex_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc3_sma3, mfcc4_sma3, HNRdBACF_sma3nz, logRelF0-H1-A3_sma3nz, F1frequency_sma3nz, F1bandwidth_sma3nz, F2amplitudeLogRelF0_sma3nz, F3frequency_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_RMSenergy_sma
+05/03/2023 06:44:31 PM Best hyper parameters (nn): {"solver": "lbfgs", "max_iter": 1000000, "learning_rate": "constant", "hidden_layer_sizes": 20, "alpha": 1, "activation": "relu"}
+05/03/2023 06:44:31 PM Accuracy (nn): 0.9304347826086956
+05/03/2023 06:44:31 PM F1 Score (nn): 0.9298735640154403
+05/03/2023 06:44:31 PM Confusion Matrix: (nn):
+[[22  1  0]
+ [ 0 72  3]
+ [ 0  4 13]]
+05/03/2023 06:44:31 PM Classification report: (nn):
+              precision    recall  f1-score   support
+
+           0       1.00      0.96      0.98        23
+           1       0.94      0.96      0.95        75
+           2       0.81      0.76      0.79        17
+
+    accuracy                           0.93       115
+   macro avg       0.92      0.89      0.90       115
+weighted avg       0.93      0.93      0.93       115
+
+05/03/2023 06:44:31 PM AUC: 0.9803724156329198
+
+05/03/2023 06:24:17 PM Sorting mesd audio files by 3 emotions
+05/03/2023 06:24:17 PM Normalizing dataset using MinMaxScaler
+05/03/2023 06:24:17 PM Split train and validation dataset (80% - 20%)
+05/03/2023 06:24:17 PM Selected features [32] (dt): Loudness_sma3, alphaRatio_sma3, hammarbergIndex_sma3, slope0-500_sma3, slope500-1500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc2_sma3, mfcc3_sma3, mfcc4_sma3, F0semitoneFrom27.5Hz_sma3nz, jitterLocal_sma3nz, shimmerLocaldB_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, logRelF0-H1-A3_sma3nz, F1frequency_sma3nz, F1bandwidth_sma3nz, F1amplitudeLogRelF0_sma3nz, F2frequency_sma3nz, F2bandwidth_sma3nz, F2amplitudeLogRelF0_sma3nz, F3frequency_sma3nz, F3bandwidth_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_zcr_sma, pcm_RMSenergy_sma, pcm_fftMag_spectralCentroid_sma, pcm_fftMag_spectralRollOff25.0_sma, pcm_fftMag_spectralRollOff50.0_sma, pcm_fftMag_spectralRollOff75.0_sma, pcm_fftMag_spectralRollOff90.0_sma
+05/03/2023 06:24:17 PM Best hyper parameters (dt): {"class_weight": "balanced", "criterion": "entropy", "max_depth": 10, "max_features": "sqrt", "splitter": "best"}
+05/03/2023 06:24:17 PM Accuracy (dt): 0.8448275862068966
+05/03/2023 06:24:17 PM F1 Score (dt): 0.8464696223316913
+05/03/2023 06:24:17 PM Confusion Matrix: (dt):
+[[ 9  1  1]
+ [ 1 33  3]
+ [ 0  3  7]]
+05/03/2023 06:24:17 PM Classification report: (dt):
+              precision    recall  f1-score   support
+
+           0       0.90      0.82      0.86        11
+           1       0.89      0.89      0.89        37
+           2       0.64      0.70      0.67        10
+
+    accuracy                           0.84        58
+   macro avg       0.81      0.80      0.81        58
+weighted avg       0.85      0.84      0.85        58
+
+05/03/2023 06:24:17 PM AUC: 0.852497931753251

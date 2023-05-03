@@ -1,0 +1,28 @@
+{
+  "emobase": {
+    "functionals": [
+      "pcm_zcr_sma_de_max",
+      "pcm_zcr_sma_de_min",
+      "pcm_zcr_sma_de_range",
+      "pcm_zcr_sma_de_maxPos",
+      "pcm_zcr_sma_de_minPos",
+      "pcm_zcr_sma_de_amean",
+      "pcm_zcr_sma_de_linregc1",
+      "pcm_zcr_sma_de_linregc2",
+      "pcm_zcr_sma_de_linregerrA",
+      "pcm_zcr_sma_de_linregerrQ",
+      "pcm_zcr_sma_de_stddev",
+      "pcm_zcr_sma_de_skewness",
+      "pcm_zcr_sma_de_kurtosis",
+      "pcm_zcr_sma_de_quartile1",
+      "pcm_zcr_sma_de_quartile2",
+      "pcm_zcr_sma_de_quartile3",
+      "pcm_zcr_sma_de_iqr1-2",
+      "pcm_zcr_sma_de_iqr2-3",
+      "pcm_zcr_sma_de_iqr1-3"
+    ],
+    "low-level": [
+      "pcm_zcr_sma"
+    ]
+  }
+}
