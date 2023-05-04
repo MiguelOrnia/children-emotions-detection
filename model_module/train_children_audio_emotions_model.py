@@ -56,7 +56,7 @@ default_parameters['dt'] = {'criterion': ['gini', 'entropy'], 'splitter': ['best
                             'class_weight': [None, 'balanced']}
 
 num_folds = 10
-val_size = 0.2
+val_size = 0.3
 grade = 2.5
 
 # Check logger output
@@ -82,19 +82,19 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
     target = dataset['target']
     features = dataset['features']
 
-    if dataset_name == 'iesc_child':
-        est = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='uniform')
-        # Using discretization
-        data_discretized = est.fit_transform(data)
-        data = data_discretized
-        log.info("Using discretization with KBinsDiscretizer")
-
     # Create the scaler object between 0 and 1
     scaler = MinMaxScaler()
 
     # Fit and transform the data
     data_scaled = scaler.fit_transform(data)
     log.info("Normalizing dataset using MinMaxScaler")
+
+    if dataset_name == 'iesc_child':
+        est = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='quantile')
+        # Using discretization
+        data_discretized = est.fit_transform(data_scaled)
+        data_scaled = data_discretized
+        log.info("Using discretization with KBinsDiscretizer")
 
     # Split train and validation dataset
     x, x_val, y, y_val = train_test_split(data_scaled, target, test_size=val_size, random_state=round(grade))
