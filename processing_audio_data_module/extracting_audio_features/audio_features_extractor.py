@@ -15,7 +15,7 @@ DATASET_MESD_RELATIVE_PATH = "datasets/mesd_audio_dataset/"
 IESC_CHILD_DATASET_NAME = "iesc_child"
 DATASET_IESC_CHILD_PATH = "../../datasets/iesc_child_audio_dataset"
 DATASET_IESC_CHILD_RELATIVE_PATH = "datasets/iesc_child_audio_dataset/"
-IESC_CHILD_LABELS_PATH = r"/processing_audio_data_module/extracting_audio_features/labels_files/" \
+IESC_CHILD_LABELS_PATH = r"processing_audio_data_module/extracting_audio_features/labels_files/" \
                          r"files_labels_iesc_child.xlsx"
 
 UNIOVI_DATASET_NAME = "uniovi"
@@ -45,8 +45,14 @@ emotions_classification = {POSITIVE: 'Positive', NEGATIVE: 'Negative', NEUTRAL: 
 mesd_negative_emotions = ['Anger', 'Disgust', 'Fear', 'Sadness']
 mesd_postive_emotions = ['Happiness']
 
+iesc_child_neutral_emotions = ['neutral']
+iesc_child_neutral_attitudes = ['apatia']
+
 iesc_child_negative_emotions = ['desprecio', 'miedo', 'tristeza', 'enojo']
+iesc_child_negative_attitudes = ['inseguridad']
+
 iesc_child_positive_emotions = ['felicidad']
+iesc_child_positive_attitudes = ['entusiasmo']
 
 
 def __set_paths(dataset):
@@ -59,24 +65,38 @@ def __set_paths(dataset):
     return path, relative_path
 
 
-#  TODO: Queda por contemplar el caso de Neutral vs No Neutral
-def __get_target(emotion):
-    if emotion in iesc_child_positive_emotions or emotion in mesd_postive_emotions:
+def __get_target(emotion, attitude):
+    if (emotion in iesc_child_positive_emotions and attitude in iesc_child_positive_attitudes) \
+            or emotion in mesd_postive_emotions:
         return emotions_classification[POSITIVE]
-    elif emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
+    elif (emotion in iesc_child_negative_emotions and attitude in iesc_child_negative_attitudes) \
+            or emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
         return emotions_classification[NEGATIVE]
     else:
-        return emotions_classification[NEUTRAL]
+        if attitude is not None:
+            if emotion in iesc_child_neutral_emotions and attitude in iesc_child_neutral_attitudes:
+                return emotions_classification[NEUTRAL]
+            else:
+                raise ValueError("Inappropriate attitude for a neutral emotion")
+        else:
+            return emotions_classification[NEUTRAL]
 
 
-#  TODO: Queda por contemplar el caso de Neutral vs No Neutral
-def __get_target_value(emotion):
-    if emotion in iesc_child_positive_emotions or emotion in mesd_postive_emotions:
+def __get_target_value(emotion, attitude):
+    if (emotion in iesc_child_positive_emotions and attitude in iesc_child_positive_attitudes) \
+            or emotion in mesd_postive_emotions:
         return POSITIVE
-    elif emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
+    elif (emotion in iesc_child_negative_emotions and attitude in iesc_child_negative_attitudes) \
+            or emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
         return NEGATIVE
     else:
-        return NEUTRAL
+        if attitude is not None:
+            if emotion in iesc_child_neutral_emotions and attitude in iesc_child_neutral_attitudes:
+                return NEUTRAL
+            else:
+                raise ValueError("Inappropriate attitude for a neutral emotion")
+        else:
+            return NEUTRAL
 
 
 def get_label_by_value(emotion_value):
@@ -168,8 +188,15 @@ def __get_emotion(filename, corpus):
                 return row['Emotion']
 
 
+def __get_attitude(filename):
+    labels = pd.read_excel(IESC_CHILD_LABELS_PATH)
+    for i, row in labels.iterrows():
+        if row['Filename'] == filename:
+            return row['Attitude']
+
+
 def __check_emotion(number_of_emotions, emotion):
-    return (number_of_emotions != 2 or emotion.lower != 'neutral') and emotion != 'ninguno'
+    return (number_of_emotions != 2 or emotion.lower != 'neutral') and emotion != 'ninguno' and emotion != 'sorpresa'
 
 
 def __extract_audio_features(relative_path, filename):
@@ -241,15 +268,25 @@ def __calculate_audio_features_from_labeled_dataset(number_of_emotions, dataset)
     paths = __set_paths(dataset)
     path = paths[0]
     relative_path = paths[1]
+    attitude = None
     for filename in os.listdir(get_path(path, __file__)):
         emotion = __get_emotion(filename, dataset)
+        if dataset == 'iesc_child':
+            attitude = __get_attitude(filename)
+        print(emotion)
+        print(attitude)
         if __check_emotion(number_of_emotions, emotion):
-            emotions.append(__get_target_value(emotion))
-            emotions_labels.append(__get_target(emotion))
-            files.append(filename)
+            try:
+                emotions.append(__get_target_value(emotion, attitude))
+                emotions_labels.append(__get_target(emotion, attitude))
+                files.append(filename)
+                print(__get_target_value(emotion, attitude))
+                print(__get_target(emotion, attitude))
 
-            # Extracting audio features using OpenSmile library
-            __extract_audio_features(relative_path, filename)
+                # Extracting audio features using OpenSmile library
+                __extract_audio_features(relative_path, filename)
+            except ValueError:
+                continue
 
     # Generating csv file with statistics (obtained with functionals configurations) of the selected features
     __export_functional_values(number_of_emotions, dataset)
@@ -296,7 +333,6 @@ def __calculate_audio_features_from_unlabeled_dataset(number_of_emotions, datase
     __export_data_results_to_json(number_of_emotions, dataset)
 
 
-# TODO: Cambiar nombre fichero para definir sin en dos emociones es Neutral vs No Neutral o Positivo vs Negativo
 def get_audio_features(dataset, number_of_emotions=None):
     global audios_data
     try:
