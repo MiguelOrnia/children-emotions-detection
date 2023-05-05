@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # children_audio_emotions_classifier('dt', 3, 'mesd')
 
     # Sorting by Neutral, Positive and Negative using IESC-Child corpus
-    children_audio_emotions_classifier('svc', 2, 'iesc_child')
+    children_audio_emotions_classifier('svc', 3, 'iesc_child')
     # children_audio_emotions_classifier('nn', 3, 'iesc_child')
     # children_audio_emotions_classifier('dt', 3, 'iesc_child')
 

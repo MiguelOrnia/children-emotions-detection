@@ -19,6 +19,7 @@ from multiprocessing import cpu_count
 import logging as log
 import numpy as np
 from sklearn import svm
+from imblearn.over_sampling import SMOTE
 import joblib
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_curve, confusion_matrix, classification_report, roc_auc_score, auc
@@ -89,17 +90,23 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
     data_scaled = scaler.fit_transform(data)
     log.info("Normalizing dataset using MinMaxScaler")
 
+    """
     if dataset_name == 'iesc_child':
         est = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='quantile')
         # Using discretization
         data_discretized = est.fit_transform(data_scaled)
         data_scaled = data_discretized
         log.info("Using discretization with KBinsDiscretizer")
+    """
 
     # Split train and validation dataset
     x, x_val, y, y_val = train_test_split(data_scaled, target, test_size=val_size, random_state=round(grade))
     log.info("Split train and validation dataset (" + str(int((1 - val_size) * 100)) + "% - " + str(
         int(val_size * 100)) + "%)")
+
+    # Applying SMOTE sampling to training data
+    sm = SMOTE(random_state=42)
+    x, y = sm.fit_resample(x, y)
 
     if classifier is None:
         x2 = x
