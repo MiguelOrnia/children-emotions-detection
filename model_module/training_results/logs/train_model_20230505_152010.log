@@ -1,0 +1,23 @@
+05/05/2023 03:20:10 PM Sorting iesc_child audio files by 3 emotions
+05/06/2023 02:33:08 AM Normalizing dataset using MinMaxScaler
+05/06/2023 02:33:08 AM Split train and validation dataset (80% - 20%)
+05/06/2023 02:33:12 AM Selected features [20] (svc): Loudness_sma3, slope0-500_sma3, spectralFlux_sma3, mfcc1_sma3, mfcc3_sma3, mfcc4_sma3, F0semitoneFrom27.5Hz_sma3nz, HNRdBACF_sma3nz, logRelF0-H1-H2_sma3nz, logRelF0-H1-A3_sma3nz, F1frequency_sma3nz, F1bandwidth_sma3nz, F2frequency_sma3nz, F2bandwidth_sma3nz, F3frequency_sma3nz, F3bandwidth_sma3nz, F3amplitudeLogRelF0_sma3nz, pcm_fftMag_spectralCentroid_sma, pcm_fftMag_spectralRollOff25.0_sma, pcm_fftMag_spectralRollOff90.0_sma
+05/06/2023 02:33:46 AM Best hyper parameters (svc): {"C": 1, "cache_size": 4096, "gamma": "scale", "kernel": "poly", "probability": true, "tol": 0.01}
+05/06/2023 02:33:46 AM Accuracy (svc): 0.6528497409326425
+05/06/2023 02:33:46 AM F1 Score (svc): 0.6488484599909906
+05/06/2023 02:33:46 AM Confusion Matrix: (svc): 
+[[113  21   7]
+ [ 17  92  34]
+ [ 19  36  47]]
+05/06/2023 02:33:46 AM Classification report: (svc): 
+              precision    recall  f1-score   support
+
+           0       0.76      0.80      0.78       141
+           1       0.62      0.64      0.63       143
+           2       0.53      0.46      0.49       102
+
+    accuracy                           0.65       386
+   macro avg       0.64      0.64      0.63       386
+weighted avg       0.65      0.65      0.65       386
+
+05/06/2023 02:33:46 AM AUC: 0.8154665551869548

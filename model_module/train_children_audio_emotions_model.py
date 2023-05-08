@@ -18,6 +18,7 @@ import sys
 from multiprocessing import cpu_count
 import logging as log
 import numpy as np
+from imblearn.under_sampling import RandomUnderSampler
 from sklearn import svm
 from imblearn.over_sampling import SMOTE
 import joblib
@@ -51,13 +52,13 @@ default_parameters['svc'] = {'C': [1], 'kernel': ['linear', 'poly', 'rbf', 'sigm
 default_parameters['nn'] = {'hidden_layer_sizes': [20, (20, 20)],
                             'activation': ['identity', 'relu', 'tanh', 'relu'], 'solver': ['adam', 'sgd', 'lbfgs'],
                             'alpha': [1, 0.1, 0.01, 0.001], 'learning_rate': ['constant', 'invscaling', 'adaptive'],
-                            'max_iter': [4000, 100000, 150000, 500000, 1000000]}
+                            'max_iter': [100000, 150000, 500000, 1000000]}
 default_parameters['dt'] = {'criterion': ['gini', 'entropy'], 'splitter': ['best', 'random'],
                             'max_depth': [None, 5, 10, 15], 'max_features': ['sqrt'],
                             'class_weight': [None, 'balanced']}
 
 num_folds = 10
-val_size = 0.2
+val_size = 0.3
 grade = 2.5
 
 # Check logger output
@@ -105,9 +106,18 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
         int(val_size * 100)) + "%)")
 
     """
-    # Applying SMOTE sampling to training data
+    # Oversampling. Applying SMOTE sampling to training data
     sm = SMOTE(random_state=42)
     x, y = sm.fit_resample(x, y)
+    """
+
+    """
+    # Undersampling
+    # Create an instance of the RandomUnderSampler
+    rus = RandomUnderSampler(random_state=42)
+
+    # Fit and transform the data
+    x, y = rus.fit_resample(x, y)
     """
 
     if classifier is None:

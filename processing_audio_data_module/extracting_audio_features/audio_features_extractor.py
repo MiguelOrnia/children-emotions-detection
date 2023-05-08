@@ -70,7 +70,7 @@ def __get_target(emotion, attitude):
             or emotion in mesd_postive_emotions:
         return emotions_classification[POSITIVE]
     elif (emotion in iesc_child_negative_emotions and attitude in iesc_child_negative_attitudes) \
-            or emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
+            or emotion in mesd_negative_emotions:
         return emotions_classification[NEGATIVE]
     else:
         if attitude is not None:
@@ -87,7 +87,7 @@ def __get_target_value(emotion, attitude):
             or emotion in mesd_postive_emotions:
         return POSITIVE
     elif (emotion in iesc_child_negative_emotions and attitude in iesc_child_negative_attitudes) \
-            or emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
+            or emotion in mesd_negative_emotions:
         return NEGATIVE
     else:
         if attitude is not None:
@@ -282,6 +282,7 @@ def __calculate_audio_features_from_labeled_dataset(number_of_emotions, dataset)
                 files.append(filename)
                 print(__get_target_value(emotion, attitude))
                 print(__get_target(emotion, attitude))
+                print(len(emotions))
 
                 # Extracting audio features using OpenSmile library
                 __extract_audio_features(relative_path, filename)
