@@ -18,9 +18,9 @@ DATASET_IESC_CHILD_RELATIVE_PATH = "datasets/iesc_child_audio_dataset/"
 IESC_CHILD_LABELS_PATH = r"processing_audio_data_module/extracting_audio_features/labels_files/" \
                          r"files_labels_iesc_child.xlsx"
 
-UNIOVI_DATASET_NAME = "uniovi"
-DATASET_UNIOVI_PATH = "../../datasets/uniovi_full_dataset_cleaned"
-DATASET_UNIOVI_RELATIVE_PATH = "datasets/uniovi_full_dataset_cleaned/"
+DRAW_TALK_DATASET_NAME = "draw_talk"
+DATASET_DRAW_TALK_PATH = "../../datasets/draw_talk_full_dataset_cleaned"
+DATASET_DRAW_TALK_RELATIVE_PATH = "datasets/draw_talk_full_dataset_cleaned/"
 
 CONF_FEATURES_PATH = "processing_audio_data_module/extracting_audio_features/conf_features"
 OUTPUT_FUNCTIONALS_PATH = "processing_audio_data_module/extracting_audio_features/outputs/functionals/"
@@ -43,16 +43,10 @@ file_number = 0
 emotions_classification = {POSITIVE: 'Positive', NEGATIVE: 'Negative', NEUTRAL: 'Neutral'}
 
 mesd_negative_emotions = ['Anger', 'Disgust', 'Fear', 'Sadness']
-mesd_postive_emotions = ['Happiness']
-
-iesc_child_neutral_emotions = ['neutral']
-iesc_child_neutral_attitudes = ['apatia']
+mesd_positive_emotions = ['Happiness']
 
 iesc_child_negative_emotions = ['desprecio', 'miedo', 'tristeza', 'enojo']
-iesc_child_negative_attitudes = ['inseguridad']
-
 iesc_child_positive_emotions = ['felicidad']
-iesc_child_positive_attitudes = ['entusiasmo']
 
 
 def __set_paths(dataset):
@@ -65,38 +59,26 @@ def __set_paths(dataset):
     return path, relative_path
 
 
-def __get_target(emotion, attitude):
-    if (emotion in iesc_child_positive_emotions and attitude in iesc_child_positive_attitudes) \
-            or emotion in mesd_postive_emotions:
+def __get_target(emotion):
+    if emotion in iesc_child_positive_emotions or emotion in mesd_positive_emotions:
         return emotions_classification[POSITIVE]
-    elif (emotion in iesc_child_negative_emotions and attitude in iesc_child_negative_attitudes) \
-            or emotion in mesd_negative_emotions:
+    elif emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
         return emotions_classification[NEGATIVE]
+    elif emotion == 'Neutral':
+        return emotions_classification[NEUTRAL]
     else:
-        if attitude is not None:
-            if emotion in iesc_child_neutral_emotions and attitude in iesc_child_neutral_attitudes:
-                return emotions_classification[NEUTRAL]
-            else:
-                raise ValueError("Inappropriate attitude for a neutral emotion")
-        else:
-            return emotions_classification[NEUTRAL]
+        raise ValueError("Inappropriate emotion for IESC-Child: Neutral")
 
 
-def __get_target_value(emotion, attitude):
-    if (emotion in iesc_child_positive_emotions and attitude in iesc_child_positive_attitudes) \
-            or emotion in mesd_postive_emotions:
+def __get_target_value(emotion):
+    if emotion in iesc_child_positive_emotions or emotion in mesd_positive_emotions:
         return POSITIVE
-    elif (emotion in iesc_child_negative_emotions and attitude in iesc_child_negative_attitudes) \
-            or emotion in mesd_negative_emotions:
+    elif emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
         return NEGATIVE
+    elif emotion == 'Neutral':
+        return NEUTRAL
     else:
-        if attitude is not None:
-            if emotion in iesc_child_neutral_emotions and attitude in iesc_child_neutral_attitudes:
-                return NEUTRAL
-            else:
-                raise ValueError("Inappropriate attitude for a neutral emotion")
-        else:
-            return NEUTRAL
+        raise ValueError("Inappropriate emotion for IESC-Child: Neutral")
 
 
 def get_label_by_value(emotion_value):
@@ -161,8 +143,11 @@ def __get_selected_features_from_json_file(features_filename, conf):
 
 
 def __export_data_results_to_json(number_of_emotions, dataset):
-    with open(OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(number_of_emotions) + "_" + dataset
-              + ".json", "w") as outfile:
+    if dataset == DRAW_TALK_DATASET_NAME:
+        filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + dataset + ".json"
+    else:
+        filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(number_of_emotions) + "_" + dataset + ".json"
+    with open(filename, "w") as outfile:
         json.dump(audios_data, outfile, cls=NpEncoder)
 
 
@@ -188,15 +173,8 @@ def __get_emotion(filename, corpus):
                 return row['Emotion']
 
 
-def __get_attitude(filename):
-    labels = pd.read_excel(IESC_CHILD_LABELS_PATH)
-    for i, row in labels.iterrows():
-        if row['Filename'] == filename:
-            return row['Attitude']
-
-
 def __check_emotion(number_of_emotions, emotion):
-    return (number_of_emotions != 2 or emotion.lower != 'neutral') and emotion != 'ninguno' and emotion != 'sorpresa'
+    return number_of_emotions != 2 or emotion.lower() != 'neutral'
 
 
 def __extract_audio_features(relative_path, filename):
@@ -260,29 +238,19 @@ def __export_functional_values(number_of_emotions, dataset):
         quotechar='\'', quoting=csv.QUOTE_NONNUMERIC)
 
 
-# TODO: Revisar el tema de Functionals, porque no se si tengo suficientes functionals. Habria que cambiar el nombre
-#  del fichero.
 def __calculate_audio_features_from_labeled_dataset(number_of_emotions, dataset):
     global file_number
     file_number = 0
     paths = __set_paths(dataset)
     path = paths[0]
     relative_path = paths[1]
-    attitude = None
     for filename in os.listdir(get_path(path, __file__)):
         emotion = __get_emotion(filename, dataset)
-        if dataset == 'iesc_child':
-            attitude = __get_attitude(filename)
-        print(emotion)
-        print(attitude)
         if __check_emotion(number_of_emotions, emotion):
             try:
-                emotions.append(__get_target_value(emotion, attitude))
-                emotions_labels.append(__get_target(emotion, attitude))
+                emotions.append(__get_target_value(emotion))
+                emotions_labels.append(__get_target(emotion))
                 files.append(filename)
-                print(__get_target_value(emotion, attitude))
-                print(__get_target(emotion, attitude))
-                print(len(emotions))
 
                 # Extracting audio features using OpenSmile library
                 __extract_audio_features(relative_path, filename)
@@ -309,8 +277,8 @@ def __calculate_audio_features_from_labeled_dataset(number_of_emotions, dataset)
 def __calculate_audio_features_from_unlabeled_dataset(number_of_emotions, dataset):
     global file_number
     file_number = 0
-    path = DATASET_UNIOVI_PATH
-    relative_path = DATASET_UNIOVI_RELATIVE_PATH
+    path = DATASET_DRAW_TALK_PATH
+    relative_path = DATASET_DRAW_TALK_RELATIVE_PATH
     for root, dirs, dir_files in os.walk(get_path(path, __file__)):
         for file in dir_files:
             if file.endswith('.wav'):
@@ -334,19 +302,49 @@ def __calculate_audio_features_from_unlabeled_dataset(number_of_emotions, datase
     __export_data_results_to_json(number_of_emotions, dataset)
 
 
-def get_audio_features(dataset, number_of_emotions=None):
+def __get_audio_features_data(audio_data_filename):
+    global audios_data
+    audio_data_file = open(audio_data_filename)
+    audios_data = json.load(audio_data_file)
+    audio_data_file.close()
+
+
+def get_audio_features(dataset=None, number_of_emotions=None, multiple_dataset=False):
     global audios_data
     try:
-        if dataset == UNIOVI_DATASET_NAME:
-            audio_data_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + dataset + ".json"
+        if multiple_dataset:
+            data_combined = {'data': [], 'target': [], 'target_names': [], 'files': [], 'features': []}
+
+            audio_data_mesd_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(number_of_emotions) + "_mesd.json"
+            audio_data_iesc_child_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(
+                number_of_emotions) + "_iesc_child.json"
+
+            __get_audio_features_data(audio_data_mesd_filename)
+            data_mesd = audios_data
+            __get_audio_features_data(audio_data_iesc_child_filename)
+            data_iesc_child = audios_data
+
+            data_combined["data"].extend(data_mesd["data"])
+            data_combined["target"].extend(data_mesd["target"])
+            data_combined["target_names"].extend(data_mesd["target_names"])
+            data_combined["files"].extend(data_mesd["files"])
+            data_combined["features"].extend(data_mesd["features"])
+
+            data_combined["data"].extend(data_iesc_child["data"])
+            data_combined["target"].extend(data_iesc_child["target"])
+            data_combined["target_names"].extend(data_iesc_child["target_names"])
+            data_combined["files"].extend(data_iesc_child["files"])
+
+            audios_data = data_combined
         else:
-            audio_data_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(number_of_emotions) + "_" \
-                                  + dataset + ".json"
-        audio_data_file = open(audio_data_filename)
-        audios_data = json.load(audio_data_file)
-        audio_data_file.close()
+            if dataset == DRAW_TALK_DATASET_NAME:
+                audio_data_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + dataset + ".json"
+            else:
+                audio_data_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(number_of_emotions) + "_" \
+                                      + dataset + ".json"
+            __get_audio_features_data(audio_data_filename)
     except FileNotFoundError:
-        if dataset == UNIOVI_DATASET_NAME:
+        if dataset == DRAW_TALK_DATASET_NAME:
             __calculate_audio_features_from_unlabeled_dataset(number_of_emotions, dataset)
         else:
             __calculate_audio_features_from_labeled_dataset(number_of_emotions, dataset)

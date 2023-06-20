@@ -1,5 +1,8 @@
 import json
 import os
+import logging as log
+import sys
+from datetime import datetime
 import numpy as np
 import pandas as pd
 from colormap import rgb2hex
@@ -61,6 +64,24 @@ def remove_outliers(feature_data):
     return feature_data[(feature_data >= lower_bound) & (feature_data <= upper_bound)]
 
 
+""" Logger function """
+
+
+def get_logger(name, console_log, file, subdirectory1, subdirectory2):
+    # Check logger output
+    if console_log:
+        log.basicConfig(stream=sys.stdout, level=log.INFO, format='%(asctime)s %(message)s',
+                        datefmt='%m/%d/%Y %I:%M:%S %p')
+    else:
+        # Logger to file
+        sufix = datetime.now().strftime('%Y%m%d_%H%M%S')
+        log_name = name + "_" + sufix
+        log.basicConfig(filename=os.path.join(get_path("", file), subdirectory1, subdirectory2, log_name + '.log'),
+                        filemode='w',
+                        level=log.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    return log
+
+
 """ Encoder class for exporting data to JSON file """
 
 
@@ -73,3 +94,4 @@ class NpEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
+

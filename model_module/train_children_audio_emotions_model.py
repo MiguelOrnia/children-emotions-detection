@@ -1,26 +1,21 @@
 """
-    Classifies children' audio files in different emotion groups using MESD and IESC-Child corpus.
+    Classifies children' audio files in different emotional expressions groups using MESD and IESC-Child datasets.
     In addition, this script use three classifiers: Support Vector Machine, Multilayer Perceptron and Decision Trees.
 
     The selected classes by corpus are the following ones:
     1) MESD Corpus:
-        1.1) Positive and Negative emotions
-        1.2) Positive, Negative and Neutral emotions
+        1.1) Positive and Negative emotional expressions
+        1.2) Positive, Negative and Neutral emotional expressions
     2) IESC-Child corpus:
         2.1) Positive and Negative emotions
-        2.2) Positive, Negative and Neutral emotions
 """
 
 import json
-from datetime import datetime
 import os
-import sys
 from multiprocessing import cpu_count
-import logging as log
 import numpy as np
-from imblearn.under_sampling import RandomUnderSampler
+# from imblearn.over_sampling import SMOTE
 from sklearn import svm
-from imblearn.over_sampling import SMOTE
 import joblib
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_curve, confusion_matrix, classification_report, roc_auc_score, auc
@@ -28,13 +23,10 @@ from sklearn.feature_selection import RFECV
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import MinMaxScaler, KBinsDiscretizer
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.tree import DecisionTreeClassifier
 from processing_audio_data_module.extracting_audio_features.audio_features_extractor import get_audio_features
-from util.helper import get_path
-
-# For logging output
-console_log = False
+from util.helper import get_path, get_logger
 
 default_classifier_rfe = dict()
 default_classifier_rfe['svc'] = LogisticRegression(solver='liblinear')
@@ -47,39 +39,40 @@ default_classifiers['nn'] = MLPClassifier()
 default_classifiers['dt'] = DecisionTreeClassifier()
 
 default_parameters = dict()
-default_parameters['svc'] = {'C': [1], 'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+default_parameters['svc'] = {'C': [0.5, 1], 'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
                              'gamma': ['scale'], 'tol': [1e-2], 'probability': [True], 'cache_size': [1024 * 4]}
 default_parameters['nn'] = {'hidden_layer_sizes': [20, (20, 20)],
                             'activation': ['identity', 'relu', 'tanh', 'relu'], 'solver': ['adam', 'sgd', 'lbfgs'],
                             'alpha': [1, 0.1, 0.01, 0.001], 'learning_rate': ['constant', 'invscaling', 'adaptive'],
-                            'max_iter': [100000, 150000, 500000, 1000000]}
+                            'max_iter': [3000, 4000, 5000, 1000000], 'n_iter_no_change': [10, 15, 20],
+                            'early_stopping': [True]}
 default_parameters['dt'] = {'criterion': ['gini', 'entropy'], 'splitter': ['best', 'random'],
                             'max_depth': [None, 5, 10, 15], 'max_features': ['sqrt'],
                             'class_weight': [None, 'balanced']}
 
 num_folds = 10
-val_size = 0.3
+val_size = 0.2
 grade = 2.5
 
-# Check logger output
-if console_log:
-    log.basicConfig(stream=sys.stdout, level=log.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-else:
-    # Logger to file
-    sufix = datetime.now().strftime('%Y%m%d_%H%M%S')
-    log_name = 'train_model_' + sufix
-    log.basicConfig(filename=os.path.join(get_path("", __file__), 'training_results', 'logs', log_name + '.log'),
-                    filemode='w',
-                    level=log.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+# For logging output
+console_log = False
+log = get_logger("train_model", console_log, __file__, "training_results", "logs")
 
 
-def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_name):
-    log.info("Sorting " + dataset_name + " audio files by " + str(number_of_emotions) + " emotions")
+def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_name=None, multiple_dataset=False):
+    if dataset_name:
+        log.info("Classifying " + dataset_name + " audio files by " + str(number_of_emotions) + " emotions")
+    else:
+        log.info("Classifying both corpus audio files by " + str(number_of_emotions) + " emotions")
     classifier = default_classifier_rfe[model_type]
     clf = default_classifiers[model_type]
     params = default_parameters[model_type]
 
-    dataset = get_audio_features(dataset_name, number_of_emotions)
+    if multiple_dataset:
+        dataset = get_audio_features(number_of_emotions=number_of_emotions, multiple_dataset=multiple_dataset)
+    else:
+        dataset = get_audio_features(dataset_name, number_of_emotions)
+
     data = dataset['data']
     target = dataset['target']
     features = dataset['features']
@@ -91,33 +84,16 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
     data_scaled = scaler.fit_transform(data)
     log.info("Normalizing dataset using MinMaxScaler")
 
-    """
-    if dataset_name == 'iesc_child':
-        est = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='quantile')
-        # Using discretization
-        data_discretized = est.fit_transform(data_scaled)
-        data_scaled = data_discretized
-        log.info("Using discretization with KBinsDiscretizer")
-    """
-
     # Split train and validation dataset
     x, x_val, y, y_val = train_test_split(data_scaled, target, test_size=val_size, random_state=round(grade))
     log.info("Split train and validation dataset (" + str(int((1 - val_size) * 100)) + "% - " + str(
         int(val_size * 100)) + "%)")
 
     """
-    # Oversampling. Applying SMOTE sampling to training data
+    # Oversampling. Applying SMOTE oversampling to training data
+    log.info("Applying oversampling with SMOTE")
     sm = SMOTE(random_state=42)
     x, y = sm.fit_resample(x, y)
-    """
-
-    """
-    # Undersampling
-    # Create an instance of the RandomUnderSampler
-    rus = RandomUnderSampler(random_state=42)
-
-    # Fit and transform the data
-    x, y = rus.fit_resample(x, y)
     """
 
     if classifier is None:
@@ -163,7 +139,10 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
     log.info('Classification report: (' + model_type + '): \n' + str(classification_report(y_val, prediction_labels)))
 
     # Save model_module into directory
-    output_name = 'model_' + model_type + '_' + dataset_name + '_' + str(number_of_emotions)
+    if dataset_name:
+        output_name = 'model_' + model_type + '_' + dataset_name + '_' + str(number_of_emotions)
+    else:
+        output_name = 'model_' + model_type + '_both_' + str(number_of_emotions)
     out_path = os.path.join(get_path("", __file__), 'training_results', 'models', model_type, output_name + '.pkl')
     # Save model_module
     joblib.dump(best_model, out_path)
