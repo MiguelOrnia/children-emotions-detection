@@ -16,4 +16,4 @@ All of them have been implemented in Python.
 ## Datasets
 Three datasets have been used, which are the following: <em>Mexican Emotional Speech Database</em> (MESD), <em>Interactive Emotional Children's Speech Corpus</em> (IESC-Child) and our case study (Draw&Talk). It should be noted that the first two are audio-only, being used for training, and the third includes audio and drawings.
 
-The only dataset available online is MESD (via the Kaggle website under the Attribution 4.0 International (CC BY 4.0) licence). The IESC-Child dataset should be requested from its authors and Draw&Talk should be requested from the authors of this article.
+The only dataset available online is MESD (via the Kaggle website under the Attribution 4.0 International (CC BY 4.0) licence). The IESC-Child dataset should be requested from its authors and Draw&Talk should be requested from the authors of this paper.
