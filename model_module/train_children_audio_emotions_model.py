@@ -7,7 +7,7 @@
         1.1) Positive and Negative emotional expressions
         1.2) Positive, Negative and Neutral emotional expressions
     2) IESC-Child corpus:
-        2.1) Positive and Negative emotions
+        2.1) Positive and Negative emotional expressions
 """
 
 import json
