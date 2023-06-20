@@ -72,7 +72,6 @@ def predict_using_existing_model(name_model, model_features):
     results['Child_Id'] = __get_children_ids(audio_data['files'])
     for color, value in __get_all_colors(drawing_data['colors']).items():
         results[color] = value
-    results['Predominant_Color'] = drawing_data['predominant_color']
     results['Number_Of_Colors'] = drawing_data['number_of_colors']
     results['Colored_Surface'] = drawing_data['colored_surface']
 

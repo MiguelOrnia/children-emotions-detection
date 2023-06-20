@@ -7,7 +7,7 @@ import colorspacious
 from skimage.color import deltaE_ciede2000
 from webcolors import hex_to_rgb
 
-from util.helper import color_to_df, get_path, hex_to_color_name, NpEncoder
+from util.helper import color_to_df, get_path, NpEncoder
 
 DATASET_DRAW_TALK_PATH = "../../datasets/draw_talk_full_dataset_cleaned"
 OUTPUT_PATH = "processing_drawings_data_module/extracting_drawing_features/outputs/"
@@ -112,22 +112,6 @@ def __get_white_hex():
     return '#' + ''.join(hex(c)[2:].zfill(2) for c in WHITE_RGB).upper()
 
 
-def __get_color_with_most_occurrences(colors_hex_occurrence):
-    white_hex = __get_white_hex()
-    exclude_white = white_hex
-    max_hex_color = None
-    max_color_frequency = float('-inf')
-
-    for color_hex, color_frequency in colors_hex_occurrence.items():
-        if color_hex == exclude_white:
-            continue
-        if color_frequency > max_color_frequency:
-            max_color_frequency = color_frequency
-            max_hex_color = color_hex
-
-    return hex_to_color_name(max_hex_color)
-
-
 def __get_colors(colors_hex_occurrence):
     colors = [occurrence for color_hex, occurrence in colors_hex_occurrence.items()]
     return np.array(colors)
@@ -150,14 +134,13 @@ def __calculate_drawing_features(drawing_file_path):
 
     drawings_data['colors'].append(
         __iterate_colors_checking_similarities(__merge_similar_colors(color_hex_occurrence_filtered)))
-    drawings_data['predominant_color'].append(__get_color_with_most_occurrences(color_hex_occurrence_filtered))
     drawings_data['number_of_colors'].append(len(__get_colors(color_hex_occurrence_filtered)))
     drawings_data['colored_surface'].append(round(sum(__get_colors(color_hex_occurrence_filtered)), 3))
 
 
 def get_drawing_features(drawings_files):
     global drawings_data
-    drawings_data = {"colors": [], "predominant_color": [], "number_of_colors": [], "colored_surface": []}
+    drawings_data = {"colors": [], "number_of_colors": [], "colored_surface": []}
     try:
         drawings_data_filename = OUTPUT_PATH + "data_drawings_" + DRAW_TALK_DATASET_NAME + ".json"
         drawings_data_file = open(drawings_data_filename)
