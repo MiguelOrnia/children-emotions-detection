@@ -1,5 +1,5 @@
 # Detecting emotional expressions in children at the pre-school stage and their relation with the use of color
-This repository contanins the code used in the paper <em>Detecting emotional expressions in children at the pre-school stage and their relation with the use of color</em>.
+This repository contanins the code used in the paper <em>Detecting emotional expressions in children at the pre-school stage and their relation with the use of color</em>, by Miguel Ornia, Maria del Puerto Paule-Ruiz, Miguel Sanchez-Santillan and Juan Ramon Perez-Perez. 
 
 ## Summary
 The paper classifies audios of pre-school children into three emotional expressions ("Positive", "Negative" and "Neutral").  
