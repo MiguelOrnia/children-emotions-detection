@@ -45,7 +45,7 @@ emotions_classification = {POSITIVE: 'Positive', NEGATIVE: 'Negative', NEUTRAL: 
 mesd_negative_emotions = ['Anger', 'Disgust', 'Fear', 'Sadness']
 mesd_positive_emotions = ['Happiness']
 
-iesc_child_negative_emotions = ['desprecio', 'miedo', 'tristeza', 'enojo']
+iesc_child_negative_emotions = ['desprecio', 'miedo', 'tristeza', 'enojo', 'sorpresa']
 iesc_child_positive_emotions = ['felicidad']
 
 
