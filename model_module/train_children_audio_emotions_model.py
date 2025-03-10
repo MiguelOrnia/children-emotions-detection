@@ -1,13 +1,10 @@
 """
-    Classifies children' audio files in different emotional expressions groups using MESD and IESC-Child datasets.
-    In addition, this script use three classifiers: Support Vector Machine, Multilayer Perceptron and Decision Trees.
+    Classifies children' audio files in different emotional expressions groups using MESD (100%), Draw&Talk (20%)
+    and Combined (MESD 100% + Draw&Talk 20%) datasets.
+    In addition, this script use three classifiers: Multilayer Perceptron (MLP), Support Vector Machine (SVM)
+    with different kernels, K Nearest Neighbors (KNN) and Logistic Regression (LR).
 
-    The selected classes by corpus are the following ones:
-    1) MESD Corpus:
-        1.1) Positive and Negative emotional expressions
-        1.2) Positive, Negative and Neutral emotional expressions
-    2) IESC-Child corpus:
-        2.1) Positive and Negative emotional expressions
+    The selected classes are the following ones: Positive, Negative and Neutral emotional expressions.
 """
 
 import json
@@ -22,33 +19,39 @@ from sklearn.metrics import accuracy_score, roc_curve, confusion_matrix, classif
 from sklearn.feature_selection import RFECV
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.tree import DecisionTreeClassifier
 from processing_audio_data_module.extracting_audio_features.audio_features_extractor import get_audio_features
 from util.helper import get_path, get_logger
 
 default_classifier_rfe = dict()
 default_classifier_rfe['svc'] = LogisticRegression(solver='liblinear')
 default_classifier_rfe['nn'] = LogisticRegression(solver='liblinear')
-default_classifier_rfe['dt'] = None
+default_classifier_rfe['knn'] = None
+default_classifier_rfe['lr'] = LogisticRegression(solver='liblinear')
 
 default_classifiers = dict()
 default_classifiers['svc'] = svm.SVC()
 default_classifiers['nn'] = MLPClassifier()
-default_classifiers['dt'] = DecisionTreeClassifier()
+default_classifiers['knn'] = KNeighborsClassifier()
+default_classifiers['lr'] = LogisticRegression()
+
 
 default_parameters = dict()
-default_parameters['svc'] = {'C': [0.5, 1], 'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+default_parameters['svc'] = {'C': [0.5, 1], 'kernel': ['poly'],
                              'gamma': ['scale'], 'tol': [1e-2], 'probability': [True], 'cache_size': [1024 * 4]}
 default_parameters['nn'] = {'hidden_layer_sizes': [20, (20, 20)],
                             'activation': ['identity', 'relu', 'tanh', 'relu'], 'solver': ['adam', 'sgd', 'lbfgs'],
                             'alpha': [1, 0.1, 0.01, 0.001], 'learning_rate': ['constant', 'invscaling', 'adaptive'],
-                            'max_iter': [3000, 4000, 5000, 1000000], 'n_iter_no_change': [10, 15, 20],
+                            'max_iter': [3000, 4000, 5000, 10000, 1000000], 'n_iter_no_change': [10, 15, 20],
                             'early_stopping': [True]}
-default_parameters['dt'] = {'criterion': ['gini', 'entropy'], 'splitter': ['best', 'random'],
-                            'max_depth': [None, 5, 10, 15], 'max_features': ['sqrt'],
-                            'class_weight': [None, 'balanced']}
+default_parameters['knn'] = {'n_neighbors': [1, 3, 5, 7, 9, 11, 13, 15, 17, 19], 'weights': ['uniform', 'distance'],
+                             'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute'],
+                             'leaf_size': [10, 20, 30, 40, 50], 'p': [1, 2],
+                             'metric': ['euclidean', 'manhattan', 'chebyshev', 'minkowski']}
+default_parameters['lr'] = {'penalty': ['l2', 'l1'], 'tol': [1e-2, 1e-3, 1e-4, 1e-5], 'solver': ['liblinear'],
+                            'max_iter': [100, 50, 200]}
 
 num_folds = 10
 val_size = 0.2
@@ -68,14 +71,34 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
     clf = default_classifiers[model_type]
     params = default_parameters[model_type]
 
+    # Uncomment only when need two dataset with different proportions
+    dataset2 = {}
+
     if multiple_dataset:
         dataset = get_audio_features(number_of_emotions=number_of_emotions, multiple_dataset=multiple_dataset)
     else:
         dataset = get_audio_features(dataset_name, number_of_emotions)
+        # Uncomment only when need two dataset with different proportions
+        dataset2 = get_audio_features('draw_talk', number_of_emotions)
 
     data = dataset['data']
     target = dataset['target']
     features = dataset['features']
+
+    # Uncomment only when need two dataset with different proportions
+    skf = StratifiedKFold(n_splits=5)
+    first_fold_train_indices, first_fold_test_indices = next(skf.split(dataset2['data'], dataset2['target']))
+    first_fold_train_data = [dataset2['data'][i] for i in first_fold_test_indices]
+    first_fold_train_target = [dataset2['target'][i] for i in first_fold_test_indices]
+
+    # Uncomment only when need two dataset with different proportions
+    data2 = first_fold_train_data
+    target2 = first_fold_train_target
+
+    # Uncomment only when need two dataset with different proportions
+    data = np.concatenate((data, data2))
+    target = np.concatenate((target, target2))
+    print(target)
 
     # Create the scaler object between 0 and 1
     scaler = MinMaxScaler()
@@ -104,7 +127,7 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
         # N_jobs for cross validation
         # 10 is for the numbers of folds in CV
         n_jobs = min(10, cpu_count())
-        # Get best variables using RFE
+        # Get the best variables using RFE
         selector = RFECV(estimator=classifier, step=1, n_jobs=n_jobs, verbose=0, cv=10, min_features_to_select=10)
         selector = selector.fit(x, y)
 
@@ -166,3 +189,20 @@ def children_audio_emotions_classifier(model_type, number_of_emotions, dataset_n
         # Compute ROC curve and area the curve
         roc_auc = roc_auc_score(y_val, probabilities, multi_class='ovr')
         log.info('AUC: ' + str(roc_auc))
+
+
+# Uncomment only when need two dataset with different proportions
+def get_data2():
+    dataset2 = get_audio_features('draw_talk', 3)
+
+    skf = StratifiedKFold(n_splits=5)
+    first_fold_train_indices, first_fold_test_indices = next(skf.split(dataset2['data'], dataset2['target']))
+    first_fold_test_data = [dataset2['data'][i] for i in first_fold_train_indices]
+    first_fold_test_target = [dataset2['target'][i] for i in first_fold_train_indices]
+    first_fold_test_files = [dataset2['files'][i] for i in first_fold_train_indices]
+
+    data = first_fold_test_data
+    target = first_fold_test_target
+    files = first_fold_test_files
+
+    return data, target, files

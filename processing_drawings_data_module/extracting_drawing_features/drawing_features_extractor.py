@@ -122,7 +122,7 @@ def __export_data_results_to_json(dataset):
         json.dump(drawings_data, outfile, cls=NpEncoder)
 
 
-def __calculate_drawing_features(drawing_file_path):
+def __calculate_drawing_features(audio_file, drawing_file_path):
     colors_x = extcolors.extract_from_path(get_path(drawing_file_path, __file__), tolerance=15)
     df_color = color_to_df(colors_x)
     colors = list(df_color['c_code'])
@@ -136,11 +136,12 @@ def __calculate_drawing_features(drawing_file_path):
         __iterate_colors_checking_similarities(__merge_similar_colors(color_hex_occurrence_filtered)))
     drawings_data['number_of_colors'].append(len(__get_colors(color_hex_occurrence_filtered)))
     drawings_data['colored_surface'].append(round(sum(__get_colors(color_hex_occurrence_filtered)), 3))
+    drawings_data['files'].append(audio_file)
 
 
 def get_drawing_features(drawings_files):
     global drawings_data
-    drawings_data = {"colors": [], "number_of_colors": [], "colored_surface": []}
+    drawings_data = {"colors": [], "number_of_colors": [], "colored_surface": [], "files": []}
     try:
         drawings_data_filename = OUTPUT_PATH + "data_drawings_" + DRAW_TALK_DATASET_NAME + ".json"
         drawings_data_file = open(drawings_data_filename)
@@ -149,13 +150,29 @@ def get_drawing_features(drawings_files):
     except FileNotFoundError:
         number_of_files = 0
         for drawing_file in drawings_files:
+            audio_file = drawing_file
             drawing_file_name = drawing_file.replace("audio", "drawing")
             drawing_file_name_with_extension = drawing_file_name.replace(".wav", ".png")
             drawing_file_path = DATASET_DRAW_TALK_PATH + "/" + drawing_file.split("_")[1].split(".")[
                 0] + "/" + drawing_file_name_with_extension
-            __calculate_drawing_features(drawing_file_path)
+            __calculate_drawing_features(audio_file, drawing_file_path)
             number_of_files += 1
             if len(drawings_files) == number_of_files:
                 __export_data_results_to_json(DRAW_TALK_DATASET_NAME)
     finally:
-        return drawings_data
+        filtered_drawings = {
+            "colors": [],
+            "predominant_color": [],
+            "number_of_colors": [],
+            "colored_surface": [],
+            "files": []
+        }
+
+        for idx, filename in enumerate(drawings_data["files"]):
+            if filename in drawings_files:
+                filtered_drawings["colors"].append(drawings_data["colors"][idx])
+                filtered_drawings["number_of_colors"].append(drawings_data["number_of_colors"][idx])
+                filtered_drawings["colored_surface"].append(drawings_data["colored_surface"][idx])
+                filtered_drawings["files"].append(filename)
+
+        return filtered_drawings

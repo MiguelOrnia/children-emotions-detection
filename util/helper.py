@@ -1,3 +1,6 @@
+""" Python file with utilities for drawings, operating system (file management),
+determination and removal of outliers, logging functions and JSON file encoding. """
+
 import json
 import os
 import logging as log
@@ -76,7 +79,8 @@ def get_logger(name, console_log, file, subdirectory1, subdirectory2):
         # Logger to file
         sufix = datetime.now().strftime('%Y%m%d_%H%M%S')
         log_name = name + "_" + sufix
-        log.basicConfig(filename=os.path.join(get_path("", file), subdirectory1, subdirectory2, log_name + '.log'),
+        log.basicConfig(filename=os.path.join(get_path("", file),
+                                              subdirectory1, subdirectory2, log_name + '.log'),
                         filemode='w',
                         level=log.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     return log

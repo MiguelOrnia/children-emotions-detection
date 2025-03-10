@@ -12,12 +12,6 @@ MESD_DATASET_NAME = "mesd"
 DATASET_MESD_PATH = "../../datasets/mesd_audio_dataset"
 DATASET_MESD_RELATIVE_PATH = "datasets/mesd_audio_dataset/"
 
-IESC_CHILD_DATASET_NAME = "iesc_child"
-DATASET_IESC_CHILD_PATH = "../../datasets/iesc_child_audio_dataset"
-DATASET_IESC_CHILD_RELATIVE_PATH = "datasets/iesc_child_audio_dataset/"
-IESC_CHILD_LABELS_PATH = r"processing_audio_data_module/extracting_audio_features/labels_files/" \
-                         r"files_labels_iesc_child.xlsx"
-
 DRAW_TALK_DATASET_NAME = "draw_talk"
 DATASET_DRAW_TALK_PATH = "../../datasets/draw_talk_full_dataset_cleaned"
 DATASET_DRAW_TALK_RELATIVE_PATH = "datasets/draw_talk_full_dataset_cleaned/"
@@ -45,40 +39,33 @@ emotions_classification = {POSITIVE: 'Positive', NEGATIVE: 'Negative', NEUTRAL: 
 mesd_negative_emotions = ['Anger', 'Disgust', 'Fear', 'Sadness']
 mesd_positive_emotions = ['Happiness']
 
-iesc_child_negative_emotions = ['desprecio', 'miedo', 'tristeza', 'enojo']
-iesc_child_positive_emotions = ['felicidad']
-
 
 def __set_paths(dataset):
-    if dataset == MESD_DATASET_NAME:
-        path = DATASET_MESD_PATH
-        relative_path = DATASET_MESD_RELATIVE_PATH
-    else:
-        path = DATASET_IESC_CHILD_PATH
-        relative_path = DATASET_IESC_CHILD_RELATIVE_PATH
+    path = DATASET_MESD_PATH
+    relative_path = DATASET_MESD_RELATIVE_PATH
     return path, relative_path
 
 
 def __get_target(emotion):
-    if emotion in iesc_child_positive_emotions or emotion in mesd_positive_emotions:
+    if emotion in mesd_positive_emotions:
         return emotions_classification[POSITIVE]
-    elif emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
+    elif emotion in mesd_negative_emotions:
         return emotions_classification[NEGATIVE]
     elif emotion == 'Neutral':
         return emotions_classification[NEUTRAL]
     else:
-        raise ValueError("Inappropriate emotion for IESC-Child: Neutral")
+        raise ValueError("Inappropriate emotion")
 
 
 def __get_target_value(emotion):
-    if emotion in iesc_child_positive_emotions or emotion in mesd_positive_emotions:
+    if emotion in mesd_positive_emotions:
         return POSITIVE
-    elif emotion in iesc_child_negative_emotions or emotion in mesd_negative_emotions:
+    elif emotion in mesd_negative_emotions:
         return NEGATIVE
     elif emotion == 'Neutral':
         return NEUTRAL
     else:
-        raise ValueError("Inappropriate emotion for IESC-Child: Neutral")
+        raise ValueError("Inappropriate emotion")
 
 
 def get_label_by_value(emotion_value):
@@ -166,11 +153,6 @@ def __calculate_mean_for_audio_features():
 def __get_emotion(filename, corpus):
     if corpus == MESD_DATASET_NAME:
         return str(filename).split("_")[0]
-    else:
-        labels = pd.read_excel(IESC_CHILD_LABELS_PATH)
-        for i, row in labels.iterrows():
-            if row['Filename'] == filename:
-                return row['Emotion']
 
 
 def __check_emotion(number_of_emotions, emotion):
@@ -337,10 +319,7 @@ def get_audio_features(dataset=None, number_of_emotions=None, multiple_dataset=F
 
             audios_data = data_combined
         else:
-            if dataset == DRAW_TALK_DATASET_NAME:
-                audio_data_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + dataset + ".json"
-            else:
-                audio_data_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(number_of_emotions) + "_" \
+            audio_data_filename = OUTPUT_LOW_LEVEL_PATH + "data_audios_" + str(number_of_emotions) + "_" \
                                       + dataset + ".json"
             __get_audio_features_data(audio_data_filename)
     except FileNotFoundError:
