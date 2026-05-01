@@ -1,5 +1,5 @@
-# Study of children’s emotional expressions and their relationship with the use of colour in digital drawings 
-This repository contanins the code used in the paper <em>Study of children’s emotional expressions and their relationship with the use of colour in digital drawings </em>.
+# Artificial Intelligence Models for Analysing Children’s Emotional Expressions and Colour Use in Digital Drawings
+This repository contanins the code used in the paper <em>Artificial Intelligence Models for Analysing Children’s Emotional Expressions and Colour Use in Digital Drawings </em>. The published article is available to consult at the link below: https://ieeexplore.ieee.org/document/11494800.
 
 ## Summary
 The work studies audios and drawings of pre-school children using three emotional expressions (‘Positive’, ‘Negative’ and ‘Neutral’).
